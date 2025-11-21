@@ -9,13 +9,23 @@
 </head>
 
 <body>
-    <div id="juego-contenedor">
+    <div id="juego-contenedor" class="fondo1"> <!--cambiamos fondo cada 5 minutos -->
+
+
         <div id="pixel-bot"></div>
+
+
         <div id="suelo"></div>
+
+        <!-- MENSAJE DE INICIO + NICKNAME -->
         <div id="mensaje-juego">
-            Presiona ESPACIO para empezar
+            <h3>Ingresa tu nickname</h3>
+            <input type="text" id="nickname" placeholder="Tu nombre"><br><br>
+            <button id="btn-iniciar">Iniciar Juego</button>
         </div>
-        <div id="puntuacion">Puntuación: 0</div>
+
+        <!-- PUNTUACIÓN -->
+        <div id="puntuacion">Puntuación: 0 | Nivel: 1</div>
     </div>
 
     <script src="js/main.js"></script>

@@ -1,109 +1,127 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     const pixelBot = document.getElementById("pixel-bot");
     const juegoContenedor = document.getElementById("juego-contenedor");
     const mensajeJuego = document.getElementById("mensaje-juego");
     const puntuacionDisplay = document.getElementById("puntuacion");
     const suelo = document.getElementById("suelo");
 
+    const btnIniciar = document.getElementById("btn-iniciar");//botón para iniciar
+    const nicknameInput = document.getElementById("nickname");
+
+    let nickname = "";
     let isJumping = false;
-    let gravity = 0.9;
     let botBottom = 30;
     let score = 0;
     let gameOver = true;
     let obstacleInterval;
-    let gameLoopInterval;
 
-    const gameWith = 900;
+    // INICIO DEL JUEGO CON BOTÓN
+    btnIniciar.addEventListener("click", () => {
+        nickname = nicknameInput.value.trim();
+        if (nickname === "") {
+            alert("Por favor escribe un nickname");
+            return;
+        }
+
+        mensajeJuego.style.display = "none";
+        iniciarJuego();
+    });
+
+    // SALTO CON ESPACIO
+    document.addEventListener("keydown", (e) => {
+        if (gameOver) return;
+        if (e.code === "Space") jump();
+    });
 
     function jump() {
         if (isJumping) return;
         isJumping = true;
+
         let jumpHeight = 150;
         let jumpSpeed = 10;
         let currentJumpHeight = 0;
 
-        const upTimerId = setInterval(() => {
+        const up = setInterval(() => {
             if (currentJumpHeight >= jumpHeight) {
-                clearInterval(upTimerId);
-                const downTimerId = setInterval(() => {
+                clearInterval(up);
+
+                const down = setInterval(() => {
                     if (botBottom <= 30) {
-                        clearInterval(downTimerId);
+                        clearInterval(down);
                         botBottom = 30;
-                        pixelBot.style.bottom = botBottom + 'px';
                         isJumping = false;
                     }
                     botBottom -= jumpSpeed;
-                    pixelBot.style.bottom = botBottom + 'px';
+                    pixelBot.style.bottom = botBottom + "px";
                 }, 20);
             }
+
             botBottom += jumpSpeed;
             currentJumpHeight += jumpSpeed;
-            pixelBot.style.bottom = botBottom + 'px';
+            pixelBot.style.bottom = botBottom + "px";
         }, 20);
     }
 
+    // GENERAR OBSTÁCULOS
     function generarObstaculo() {
-        if (gameOver) {
-            return;
-        }
+        if (gameOver) return;
 
-        let obstaclePosition = gameWith;
-        const obstacle = document.createElement('div');
-        obstacle.classList.add('obstaculo');
+        let obstaclePosition = 900;
+        const obstacle = document.createElement("div");
+        obstacle.classList.add("obstaculo");
         juegoContenedor.appendChild(obstacle);
 
-        let randomTime = Math.random() * 2000 + 1000;
-
-        const moverObstaculo = setInterval(() => {
+        const mover = setInterval(() => {
             if (obstaclePosition < -30) {
-                clearInterval(moverObstaculo);
-                juegoContenedor.removeChild(obstacle);
+                clearInterval(mover);
+                obstacle.remove();
+
                 score++;
-                puntuacionDisplay.textContent = 'Puntuación: ' + score;
+                actualizarPuntaje();
             }
 
-            if (
-                obstaclePosition > 50 && obstaclePosition < (100)
-                &&
-                botBottom < (80)
-            ) {
-                clearInterval(moverObstaculo);
-                clearInterval(gameLoopInterval);
+            // COLISIÓN
+            if (obstaclePosition > 50 && obstaclePosition < 100 && botBottom < 80) {
+                clearInterval(mover);
                 clearInterval(obstacleInterval);
                 gameOver = true;
-                mensajeJuego.textContent = 'GAME OVER! Puntuación final: ' + score;
-                mensajeJuego.textContent += '\n Presione ESPACIO para reiniciar';
-                mensajeJuego.style.display = 'block';
-                suelo.style.animationPlayState = 'pause';
+
+                mensajeJuego.innerHTML = `GAME OVER<br>Puntuación final: ${score}`;
+                mensajeJuego.style.display = "block";
+                suelo.style.animationPlayState = "pause";
             }
+
             obstaclePosition -= 10;
-            obstacle.style.left = obstaclePosition + 'px';
+            obstacle.style.left = obstaclePosition + "px";
         }, 20);
     }
 
-    function iniciarJuego() {
-        document.querySelectorAll('.obstaculo').forEach(obs => obs.remove());
-        score = 0;
-        puntuacionDisplay.textContent = 'Puntación: 0';
-        botBottom = 30;
-        pixelBot.style.bottom = botBottom + 'px';
-        isJumping = false;
-        gameOver = false;
-        mensajeJuego.style.display = 'none';
-        suelo.style.animationPlayState = 'running';
+    // CAMBIAR FONDO Y NIVEL
+    function actualizarPuntaje() {
+        let nivel = Math.floor(score / 5) + 1;
+        if (nivel > 5) nivel = 5;
 
-        obstacleInterval = setInterval(generarObstaculo, 2000);
+        puntuacionDisplay.textContent = `Puntuación: ${score} | Nivel: ${nivel}`;
+
+        juegoContenedor.className = "";
+        juegoContenedor.classList.add("fondo" + nivel);
     }
 
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            iniciarJuego();
-        } else {
-            jump();
-        }
-    });
+    // INICIAR JUEGO
+    function iniciarJuego() {
+        document.querySelectorAll(".obstaculo").forEach(o => o.remove());
 
-    mensajeJuego.style.display = 'block';
-    suelo.style.animationPlayState = 'pause';
+        score = 0;
+        botBottom = 30;
+        gameOver = false;
+
+        pixelBot.style.bottom = "30px";
+        suelo.style.animationPlayState = "running";
+
+        obstacleInterval = setInterval(generarObstaculo, 2000);
+
+        actualizarPuntaje();
+    }
 
 });
