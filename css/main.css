@@ -96,3 +96,22 @@ body {
     right: 10px;
     color: #fff;
 }
+#jugador-nombre {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
+
+#mensaje-final {
+    display: none;
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+}

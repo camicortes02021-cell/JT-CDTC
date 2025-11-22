@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let nicknameJugador = "";
 
     const pixelBot = document.getElementById("pixel-bot");
     const juegoContenedor = document.getElementById("juego-contenedor");
@@ -6,8 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const puntuacionDisplay = document.getElementById("puntuacion");
     const suelo = document.getElementById("suelo");
 
-    const btnIniciar = document.getElementById("btn-iniciar");//botón para iniciar
+    const btnIniciar = document.getElementById("btn-iniciar");
     const nicknameInput = document.getElementById("nickname");
+
+    //  NUEVO
+    const nombreMostrado = document.getElementById("jugador-nombre");
+    const mensajeFinal = document.getElementById("mensaje-final");
 
     let nickname = "";
     let isJumping = false;
@@ -16,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = true;
     let obstacleInterval;
 
-    // INICIO DEL JUEGO CON BOTÓN
+    //  INICIO DEL JUEGO CON BOTÓN
     btnIniciar.addEventListener("click", () => {
         nickname = nicknameInput.value.trim();
         if (nickname === "") {
@@ -25,10 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         mensajeJuego.style.display = "none";
+
+        //  Mostrar nombre durante el juego
+        nombreMostrado.textContent = "Jugador: " + nickname;
+        nombreMostrado.style.display = "block";
+
         iniciarJuego();
     });
 
-    // SALTO CON ESPACIO
+    //  SALTO CON ESPACIO
     document.addEventListener("keydown", (e) => {
         if (gameOver) return;
         if (e.code === "Space") jump();
@@ -81,14 +91,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 actualizarPuntaje();
             }
 
-            // COLISIÓN
+            //  COLISIÓN
             if (obstaclePosition > 50 && obstaclePosition < 100 && botBottom < 80) {
                 clearInterval(mover);
                 clearInterval(obstacleInterval);
                 gameOver = true;
 
-                mensajeJuego.innerHTML = `GAME OVER<br>Puntuación final: ${score}`;
-                mensajeJuego.style.display = "block";
+                nombreMostrado.style.display = "none";
+
+                //  MENSAJE FINAL CON NOMBRE
+                mensajeFinal.innerHTML = `
+                    <p> GAME OVER </p>
+                    <p>${nickname}, tu puntuación final fue:</p>
+                    <h2>${score}</h2>
+                `;
+                mensajeFinal.style.display = "block";
+
                 suelo.style.animationPlayState = "pause";
             }
 
@@ -97,9 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 20);
     }
 
-    // CAMBIAR FONDO Y NIVEL
+    //  CAMBIAR FONDO Y NIVEL
     function actualizarPuntaje() {
-        let nivel = Math.floor(score / 5) + 1;
+        let nivel = Math.floor(score / 5) + 5;
         if (nivel > 5) nivel = 5;
 
         puntuacionDisplay.textContent = `Puntuación: ${score} | Nivel: ${nivel}`;
@@ -108,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         juegoContenedor.classList.add("fondo" + nivel);
     }
 
-    // INICIAR JUEGO
+    //  INICIAR JUEGO
     function iniciarJuego() {
         document.querySelectorAll(".obstaculo").forEach(o => o.remove());
 
@@ -118,6 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pixelBot.style.bottom = "30px";
         suelo.style.animationPlayState = "running";
+
+        mensajeFinal.style.display = "none";
 
         obstacleInterval = setInterval(generarObstaculo, 2000);
 
